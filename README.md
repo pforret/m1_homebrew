@@ -35,24 +35,24 @@
   You will tell your grand children about these days.
 
 
-    ### install_homebrew_native.sh from pforret/macos_m1_cli  Ⓜ️ 1️⃣
-    🍺 If you get a MacOS popup asking to install 'developer tools', please confirm
-    🍺 Create a folder for Homebrew ...
-    🍺 Download and install Homebrew from Github ...
-    🍺 Adding [/opt/homebrew/bin] to your zsh startup config path
-    🍺 Running brew a first time to trigger compilation
-    Initialized empty Git repository in /opt/homebrew/.git/
-    HEAD is now at 9db324ab7 Merge pull request #10045 from jonchang/remove-basic-autho
-    ==> make CC=clang CFLAGS= YACC=yacc -d
-    🍺  /opt/homebrew/Cellar/awk/20180827: 7 files, 203.5KB, built in 3 seconds
-    🍺 Homebrew was installed as native binary. Version will be > 2.6
-    HOMEBREW_VERSION: 2.6.2-91-g9db324a
-    #====================================
-    🍺 Installation using 'brew install' will give a warning as long as Homebrew is not yet officially released for M1
-    🍺 You can use 'brew install -s' to always build from source and skip that warning
-    🍺 You might get build errors, but remember: you are an early adopter!
-    #====================================
-    🍺 Close this terminal and start a new one to make sure brew is in the path
+        ### install_homebrew_native.sh from pforret/macos_m1_cli  Ⓜ️ 1️⃣
+        🍺 If you get a MacOS popup asking to install 'developer tools', please confirm
+        🍺 Create a folder for Homebrew ...
+        🍺 Download and install Homebrew from Github ...
+        🍺 Adding [/opt/homebrew/bin] to your zsh startup config path
+        🍺 Running brew a first time to trigger compilation
+        Initialized empty Git repository in /opt/homebrew/.git/
+        HEAD is now at 9db324ab7 Merge pull request #10045 from jonchang/remove-basic-autho
+        ==> make CC=clang CFLAGS= YACC=yacc -d
+        🍺  /opt/homebrew/Cellar/awk/20180827: 7 files, 203.5KB, built in 3 seconds
+        🍺 Homebrew was installed as native binary. Version will be > 2.6
+        HOMEBREW_VERSION: 2.6.2-91-g9db324a
+        #====================================
+        🍺 Installation using 'brew install' will give a warning as long as Homebrew is not yet officially released for M1
+        🍺 You can use 'brew install -s' to always build from source and skip that warning
+        🍺 You might get build errors, but remember: you are an early adopter!
+        #====================================
+        🍺 Close this terminal and start a new one to make sure brew is in the path
 
 
 ## `uninstall_homebrew_native.sh`
@@ -61,11 +61,11 @@
 * run as: `curl -s https://raw.githubusercontent.com/pforret/macos_m1_cli/main/uninstall_homebrew_native.sh | bash`
 
 
-    ### uninstall_homebrew_native.sh from pforret/macos_m1_cli  Ⓜ️ 1️⃣
-    🧽 Removing [/opt/homebrew/bin] from your zsh startup config path
-    🧽 Deleting Homebrew from [/opt/homebrew]
-    Password:
-    🧽 Homebrew was uninstalled!
+        ### uninstall_homebrew_native.sh from pforret/macos_m1_cli  Ⓜ️ 1️⃣
+        🧽 Removing [/opt/homebrew/bin] from your zsh startup config path
+        🧽 Deleting Homebrew from [/opt/homebrew]
+        Password:
+        🧽 Homebrew was uninstalled!
 
 ## My Homebrew configuration
 
