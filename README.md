@@ -24,14 +24,14 @@
   which is short for `brew install --build-from-source`
 * the installation will probably work, but it's not guaranteed.
 * every time brew stops with "You can try to install ...", 
-    do that first and then run the original brew install again.
+    do that first and then run the original `brew install` again.
   
 
       Error: [some package]: no bottle available!
       You can try to install from source with e.g.
-      brew install --build-from-source ghostscript
+      brew install --build-from-source [some package]
 
-* Remember: you are an early adopter, on the curring edge. 
+* Remember: you are an early adopter, on the cutting edge. 
   You will tell your grand children about these days.
 
 
