@@ -1,5 +1,6 @@
 # Using Homebrew on Apple Silicon M1 (MacOS Big Sur)
 
+![](macos_m1_cli.jpg)
 ## `install_homebrew_native.sh`
 
 * install Homebrew in native mode (without Rosetta 2) on a fresh Apple M1 Arm computer (MacOS Big Sur)
