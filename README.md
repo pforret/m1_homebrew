@@ -1,4 +1,4 @@
-# Using CLI/Terminal on Apple M1 (MacOS Big Sur)
+# Using Homebrew on Apple Silicon M1 (MacOS Big Sur)
 
 ## `install_homebrew_native.sh`
 
