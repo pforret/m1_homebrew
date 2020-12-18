@@ -25,9 +25,11 @@ fi
 [[ $(uname -m) == "arm64" ]] || die "This script should only be run in native mode, not with Rosetta 2"
 [[ $UID -eq 0 ]] && die "You should not be root to run this script"
 
-# first run git to initiate download of developer tools
-progress "If you get a MacOS popup asking to install 'developer tools', please confirm"
-git version > /dev/null
+# first check for developer tools
+if [[ ! -x "/Library/Developer/CommandLineTools/usr/bin/git" ]] ; then
+  progress "First install Xcode develop tools"
+  xcode-select --install
+fi
 
 progress "Create a folder for Homebrew ..."
 cd /opt && sudo mkdir homebrew
