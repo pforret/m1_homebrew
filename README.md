@@ -11,19 +11,19 @@
   you will get the following warning every time you try to `brew install` a package
   
 
-    Warning: You are running macOS on a arm64 CPU architecture.
-    We do not provide support for this (yet).
-    Reinstall Homebrew under Rosetta 2 until we support it.
-    You will encounter build failures with some formulae.
-    Please create pull requests instead of asking for help on Homebrew's GitHub,
-    Twitter or any other official channels. You are responsible for resolving
-    any issues you experience while you are running this
-    unsupported configuration.
+        Warning: You are running macOS on a arm64 CPU architecture.
+        We do not provide support for this (yet).
+        Reinstall Homebrew under Rosetta 2 until we support it.
+        You will encounter build failures with some formulae.
+        Please create pull requests instead of asking for help on Homebrew's GitHub,
+        Twitter or any other official channels. You are responsible for resolving
+        any issues you experience while you are running this
+        unsupported configuration.
 
 * you can however install the package by using `brew install -s`, 
   which is short for `brew install --build-from-source`
 * the installation will probably work, but it's not guaranteed.
-* every time brew stops with "You can try to install ...", 
+* every time `brew` stops with "_You can try to install ..._", 
     do that first and then run the original `brew install` again.
   
 
