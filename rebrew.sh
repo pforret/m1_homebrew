@@ -101,7 +101,7 @@ do_install(){
     | while read -r line; do
       if brew list "$line" > /dev/null 2>&1 ; then
         # already installed
-        out "( skip [$line] - already installed )"
+        out "✔️ skip [$line] (already installed)"
       else
         announce "install [$line] ------------------------------------------------"
         brew install --build-from-source "$line" 2> /dev/null

@@ -1,7 +1,7 @@
 # Using Homebrew on Apple Silicon M1 (MacOS Big Sur)
 
 ![](macos_m1_cli.jpg)
-## `install_homebrew_native.sh`
+## install_homebrew_native.sh
 
 * install Homebrew in native mode (without Rosetta 2) on a fresh Apple M1 Arm computer (MacOS Big Sur)
 * run as: `curl -s https://raw.githubusercontent.com/pforret/macos_m1_cli/main/install_homebrew_native.sh | bash`
@@ -51,18 +51,22 @@ Error: [some package]: no bottle available!
 You can try to install from source with e.g.
 brew install --build-from-source [some package]
 ```  
-* you then have to `brew install --build-from-source` that dependency first, and run the main brew install again
-* or use ...
+* you have to `brew install --build-from-source` that dependency first, 
+  and run the main `brew install` again
+* you might have to do thius for every missing dependency, or use ...
 
-### `rebrew.sh`
+## `rebrew.sh`
 
 * **_recursive_ brew install -s** !!
 * `rebrew.sh install ffmpeg` will first look up all the dependencies of ffmpeg, 
-  build those one after the other and then run the main brew install. 
-  It takes some time, but it works!
+  build those one after the other and then run the main `brew install`. 
+  It will take some time, but it works!
 
+### install rebrew.sh
+* `git clone https://github.com/pforret/macos_m1_cli.git && cd macos_m1_cli`
+* or `basher install pforret/macos_m1_cli`
 
-## `uninstall_homebrew_native.sh`
+## uninstall_homebrew_native.sh
 
 * if you prefer running in 'Rosetta 2' mode, you can uninstall the native mode Homebrew.
 * run as: `curl -s https://raw.githubusercontent.com/pforret/macos_m1_cli/main/uninstall_homebrew_native.sh | bash`
