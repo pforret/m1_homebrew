@@ -1,3 +1,6 @@
+[![basher install](https://img.shields.io/badge/basher-install-white?logo=gnu-bash&style=flat)](https://basher.gitparade.com/package/)
+![version](https://img.shields.io/github/v/release/pforret/macos_m1_cli)
+
 # Using Homebrew on Apple Silicon M1 (MacOS Big Sur)
 
 ![](macos_m1_cli.jpg)
