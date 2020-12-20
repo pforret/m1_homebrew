@@ -50,7 +50,7 @@ startup_config(){
     comment=""
   fi
   echo "## Only for Apple M1 ARM: /opt/homebrew contains homebrew    $comment"
-  echo "[[ $(uname -m) == \"arm64\" ]] && export PATH=\"/opt/homebrew/bin:/opt/homebrew/sbin:\$PATH\"   $comment"
+  echo "[[ \$(uname -m) == \"arm64\" ]] && export PATH=\"/opt/homebrew/bin:/opt/homebrew/sbin:\$PATH\"   $comment"
 }
 
 case $(basename "$SHELL") in
