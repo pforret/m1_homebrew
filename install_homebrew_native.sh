@@ -44,20 +44,24 @@ curl -s -L "https://github.com/Homebrew/brew/tarball/master" | tar xz --strip 1 
 [[ -x "/opt/homebrew/bin/brew" ]] || die "Executable [/opt/homebrew/bin/brew] not found"
 
 startup_config(){
-  comment="#M1HBnat"
-  echo "## /opt/homebrew contains homebrew for native Apple ARM M1 mode  $comment"
-  echo "export PATH=\"/opt/homebrew/bin:\$PATH\"                   $comment"
+  if [[ -n ${1:-} ]] ; then
+    comment="#M1HBnat"
+  else
+    comment=""
+  fi
+  echo "## Only for Apple M1 ARM: /opt/homebrew contains homebrew    $comment"
+  echo "[[ $(uname -m) == \"arm64\" ]] && export PATH=\"/opt/homebrew/bin:/opt/homebrew/sbin:\$PATH\"   $comment"
 }
 
 case $(basename "$SHELL") in
 zsh)
   progress "Adding [/opt/homebrew/bin] to your zsh startup config path"
-  startup_config >> ~/.zshrc
+  startup_config 1 >> ~/.zshrc
   ;;
 
 bash)
   progress "Adding [/opt/homebrew/bin] to your bash startup config path"
-  startup_config >> ~/.bashrc
+  startup_config 1 >> ~/.bashrc
   ;;
 
 *)
@@ -74,8 +78,9 @@ progress "Homebrew was installed as native binary. Version will be > 2.6"
 /opt/homebrew/bin/brew config | grep VERSION
 echo "#===================================="
 progress "Installation using 'brew install' will give a warning as long as Homebrew is not yet officially released for M1"
-progress "You can use 'brew install -s' to always build from source and skip that warning"
-progress "You might get build errors, but remember: you are an early adopter!"
+progress "Use 'brew install -s' to always build from source and skip that warning"
+progress "You might have to brew install individual dependencies before"
+progress "You can also install with rebrew.sh install <package> to automatically first install the dependencies !"
 echo "#===================================="
 
 progress "Close this terminal and start a new one to make sure brew is in the path"
