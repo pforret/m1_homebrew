@@ -1,12 +1,4 @@
 #!/usr/bin/env bash
-### ==============================================================================
-### SO HOW DO YOU PROCEED WITH YOUR SCRIPT?
-### 1. define the options/parameters and defaults you need in list_options()
-### 2. implement the different actions in main() with helper functions
-### 3. implement helper functions you defined in previous step
-### 4. add binaries your script needs (e.g. ffmpeg, jq) to require_binaries
-### ==============================================================================
-
 ### Created by Peter Forret ( pforret ) on 2020-12-20
 script_version="1.0.0"  # if there is a VERSION.md in this script's folder, it will take priority for version number
 readonly script_author="peter@forret.com"
@@ -14,18 +6,6 @@ readonly script_created="2020-12-20"
 readonly run_as_root=-1 # run_as_root: 0 = don't check anything / 1 = script MUST run as root / -1 = script MAY NOT run as root
 
 list_options() {
-  ### Change the next lines to reflect which flags/options/parameters you need
-  ### flag:   switch a flag 'on' / no extra parameter
-  ###     flag|<short>|<long>|<description>
-  ###     e.g. "-v" or "--verbose" for verbose output / default is always 'off'
-  ### option: set an option value / 1 extra parameter
-  ###     option|<short>|<long>|<description>|<default>
-  ###     e.g. "-e <extension>" or "--extension <extension>" for a file extension
-  ### param:  comes after the options
-  ###     param|<type>|<long>|<description>
-  ###     <type> = 1 for single parameters - e.g. param|1|output expects 1 parameter <output>
-  ###     <type> = ? for optional parameters - e.g. param|1|output expects 1 parameter <output>
-  ###     <type> = n for list parameter    - e.g. param|n|inputs expects <input1> <input2> ... <input99>
 echo -n "
 #commented lines will be filtered
 flag|h|help|show usage
@@ -33,16 +13,15 @@ flag|q|quiet|no output
 flag|v|verbose|output more
 flag|f|force|do not ask for confirmation (always yes)
 option|l|log_dir|folder for log files |$HOME/log/$script_prefix
-option|t|tmp_dir|folder for temp files|.tmp
+option|t|tmp_dir|folder for temp files|$HOME/.homebrew
 option|a|architecture|install in arm64 or i386 mode|auto
-param|1|action|action to perform: check/install/uninstall
+param|1|action|action to perform: check/install/uninstall/recursive
+param|?|package|package to recursive install
 " \
 | grep -v '^#' \
 | sort
 }
 
-#####################################################################
-## Put your main script here
 #####################################################################
 
 main() {
@@ -54,6 +33,9 @@ main() {
     require_binaries tput uname awk
     log_to_file "[$script_basename] $script_version started"
     time_started=$(date '+%s')
+    # needed by tar later
+    [[ -z "${LANG:-}" ]] && export LANG="en_US.UTF-8"
+    [[ -z "${LC_ALL:-}" ]] && export LC_ALL="en_US.UTF-8"
 
     [[ $(uname) == "Darwin" ]] || die "This script should only be run on a MacOS machine"
     macos_version_major=$(sw_vers | awk '/ProductVersion:/ {print int($2)}')
@@ -72,13 +54,19 @@ main() {
         ;;
 
     install )
-        #TIP: use «$script_prefix install» to install
+        #TIP: use «$script_prefix install» to install Homebrew
         do_install
         ;;
 
     uninstall )
-        #TIP: use «$script_prefix convert» to convert input into output
+        #TIP: use «$script_prefix uninstall» to uninstall Homebrew
         do_uninstall
+        ;;
+
+    recursive )
+        #TIP: use «$script_prefix recursive package» to install a package from source but first build its dependencies
+        # shellcheck disable=SC2154
+        do_recursive "$package"
         ;;
 
     *)
@@ -136,42 +124,83 @@ do_install(){
   *) die "Cannot install for architecture [$architecture]"
   esac
 
+  [[ -x "$HOMEBREW_PREFIX/bin/brew" ]] && die "Homebrew for $architecture is already installed!"
   confirm "Are you sure you want to install Homebrew for $architecture to $HOMEBREW_PREFIX?" || die "Install interrupted"
 
   if [[ ! -d "$HOMEBREW_PREFIX" ]] ; then
+    # only runs for /opt/homebrew, because /usr/local will always exist and its permissions cannot be changed
     announce "Create folder for [$HOMEBREW_PREFIX] Homebrew ..."
     cd "$(dirname $HOMEBREW_PREFIX)" && sudo mkdir $HOMEBREW_PREFIX
     [[ -d $HOMEBREW_PREFIX ]] || die  "Folder [$HOMEBREW_PREFIX] could not be created"
     sudo chown -R "$(whoami)" "$HOMEBREW_PREFIX"
   fi
 
-  announce "Download and install Homebrew from Github ..."
-  cd "$(dirname $HOMEBREW_PREFIX)" || die "Could not cd into [$(dirname $HOMEBREW_PREFIX)]"
-  curl -s -L "https://github.com/Homebrew/brew/tarball/master" | tar xz --strip 1 -C "$(basename $HOMEBREW_PREFIX)"
-  [[ -x "$HOMEBREW_PREFIX/bin/brew" ]] || die "Executable [$HOMEBREW_PREFIX/bin/brew] not found"
+  if [[ "$architecture" == "i386" ]] ; then
+    #default installation
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  else
+    # shellcheck disable=SC2154
+    announce "Download Homebrew into [$tmp_dir] ..."
+    curl -s -L "https://github.com/Homebrew/brew/tarball/master" | tar xz --strip 1 -C "$tmp_dir"
+    install_size=$(du -sm "$tmp_dir" | awk '{print $1}')
+    [[ $install_size -lt 1 ]] && die "Homebrew could not be installed in $tmp_dir"
+    success "After download: Homebrew folder is $install_size MB"
 
-  case $(basename "$SHELL") in
-  zsh)
-    announce "Adding [$HOMEBREW_PREFIX/bin] to your zsh startup config path"
-    startup_config "$architecture" "$HOMEBREW_PREFIX" "m1HB-$architecture" >> ~/.zshrc
-    ;;
+    progress "Update Homebrew ... (10 seconds)"
+    "$tmp_dir"/bin/brew update > /dev/null 2>&1
+    install_size=$(du -sm "$tmp_dir" | awk '{print $1}')
+    success "After update  : Homebrew folder is $install_size MB"
 
-  bash)
-    announce "Adding [$HOMEBREW_PREFIX/bin] to your bash startup config path"
-    startup_config "$architecture" "$HOMEBREW_PREFIX" "m1HB-$architecture" >> ~/.bashrc
-    ;;
+    progress "Install Homebrew ... (up to 2 minutes)"
+    "$tmp_dir"/bin/brew install awk > /dev/null 2>&1
+    install_size=$(du -sm "$tmp_dir" | awk '{print $1}')
+    success "After install : Homebrew folder is $install_size MB"
 
-  *)
-    announce "Add the following to your shell startup script, could not be done automatically"
-    echo "#####"
-    startup_config "$ARCH" "$HOMEBREW_PREFIX"
-    echo "#####"
-  esac
+    announce "Move Homebrew files to $HOMEBREW_PREFIX"
 
-  [[ "$architecture" == "arm64" ]] && arch -arm64 $HOMEBREW_PREFIX/bin/brew install --build-from-source -q awk 2> /dev/null
+    # first move all folders, even hidden ones
+    (
+    find "$tmp_dir" -type d -depth 1
+    find "$tmp_dir" -type f -depth 1
+    ) \
+      | while read -r path ; do
+          progress "Moving $path ..."
+          sudo mv "$path" "$HOMEBREW_PREFIX"/
+        done
+    #cleanup temp dir
+    rm -fr "$tmp_dir"
+    directories=(bin etc include lib sbin share var opt share/zsh share/zsh/site-functions var/homebrew var/homebrew/linked Cellar Caskroom Frameworks)
+    for dir in "${directories[@]}"; do
+      if ! [[ -d "${HOMEBREW_PREFIX}/${dir}" ]]; then
+        out "Create folder $dir"
+        sudo mkdir -p "${HOMEBREW_PREFIX}/${dir}"
+        sudo chown -R "$(whoami)" "${HOMEBREW_PREFIX}/${dir}"
+        chmod 775 "${HOMEBREW_PREFIX}/${dir}"
+      fi
+    done
 
-  announce "Homebrew was installed as native arm64 binary. Version will be > 2.6"
-  arch -"$architecture" "$HOMEBREW_PREFIX/bin/brew" config | grep VERSION
+    sudo chown -R "$(whoami)" "$HOMEBREW_PREFIX"/*
+    success "All files moved to $HOMEBREW_PREFIX                           "
+
+    [[ -x "$HOMEBREW_PREFIX/bin/brew" ]] || die "Executable [$HOMEBREW_PREFIX/bin/brew] not found"
+
+    case $(basename "$SHELL") in
+    zsh)    startup_config "$architecture" "$HOMEBREW_PREFIX" "$script_prefix-$architecture" >> ~/.zshrc  ;;
+    bash)   startup_config "$architecture" "$HOMEBREW_PREFIX" "$script_prefix-$architecture" >> ~/.bashrc  ;;
+    *)      announce "Add the following to your shell startup script, could not be done automatically"
+            echo "#####"
+            startup_config "$ARCH" "$HOMEBREW_PREFIX"
+            echo "#####"
+    esac
+
+    arch -arm64 $HOMEBREW_PREFIX/bin/brew install --build-from-source -q awk 2> /dev/null
+  fi
+
+  if [[ $(arch) == "$architecture" ]] ; then
+    "$HOMEBREW_PREFIX/bin/brew" config | grep VERSION
+  else
+    arch -"$architecture" "$HOMEBREW_PREFIX/bin/brew" config | grep VERSION
+  fi
   log_to_file "Finish $architecture install of Homebrew"
 
 }
@@ -179,38 +208,38 @@ do_install(){
 do_uninstall(){
   log_to_file "Start $architecture uninstall of Homebrew"
   case "$architecture" in
-  arm64)
-    HOMEBREW_PREFIX="/opt/homebrew"
-    ;;
-
-  i386)
-    HOMEBREW_PREFIX="/usr/local"
-    ;;
-
-  *) die "Cannot uninstall for architecture [$architecture]"
+  arm64) HOMEBREW_PREFIX="/opt/homebrew" ;;
+  i386)  HOMEBREW_PREFIX="/usr/local"    ;;
+  *)     die "Cannot uninstall for architecture [$architecture]"
   esac
 
+  [[ -x "$HOMEBREW_PREFIX/bin/brew" ]] || die "Homebrew for $architecture is not installed in $HOMEBREW_PREFIX!"
   confirm "Are you sure you want to uninstall Homebrew for $architecture from $HOMEBREW_PREFIX?" || die "Install interrupted"
 
   case $(basename "$SHELL") in
-  zsh)
-    announce "Removing [/opt/homebrew/bin] from your zsh startup config path"
-    remove_from_config "~/.zshrc" "#m1HB-$architecture"
-    ;;
-
-  bash)
-    announce "Removing [/opt/homebrew/bin] from your bash startup config path"
-    remove_from_config "~/.bashrc" "#m1HB-$architecture"
-    ;;
-
-  *)
-    announce "Remove all lines mentioning $HOMEBREW_PREFIX from your startup scripts: " >&2
-    sleep 1
+  zsh)  remove_from_config ~/.zshrc "#$script_prefix-$architecture" ;;
+  bash) remove_from_config ~/.bashrc "#$script_prefix-$architecture" ;;
+  *) announce "Remove all lines mentioning $HOMEBREW_PREFIX from your startup scripts: " >&2 ;  sleep 1
   esac
 
   announce "Deleting Homebrew from [$HOMEBREW_PREFIX]"
-  [[ "$HOMEBREW_PREFIX" == "/opt/homebrew" ]] && sudo rm -fr /opt/homebrew
-  [[ "$HOMEBREW_PREFIX" == "/usr/local" ]]    && sudo rm -fr /usr/local/*
+  case "$HOMEBREW_PREFIX" in
+  /opt/homebrew)
+    # whole folder can be deleted
+    sudo rm -fr /opt/homebrew
+    success "All files have been deleted from /opt/homebrew"
+   ;;
+  /usr/local)
+    # cannot delete folder, only delete contents
+    find /usr/local -depth 1 \
+    | while read -r path ; do
+        progress "Delete $path"
+        sudo rm -fr "$path"
+      done
+    success "All files have been deleted from /usr/local"
+    ;;
+
+  esac
 
   [[ -f "$HOMEBREW_PREFIX/bin/brew" ]] && die "Could not remove Homebrew"
 }
@@ -230,9 +259,59 @@ remove_from_config(){
   tempfile="$1.tmp"
   comment="$2"
   log "Remove all lines with [$comment] from file [$conffile]"
+  log "Before: $(< "$1" wc -l ) lines"
+  log "< $conffile grep -v $comment > $tempfile"
   < "$conffile" grep -v "$comment" > "$tempfile"
   [[ -f "$tempfile" ]] && [[ $(< "$tempfile" wc -l) -gt 0 ]] && mv "$conffile" "$conffile.bak" && mv "$tempfile" "$conffile"
+  log "After: $(< "$1" wc -l ) lines"
 }
+
+
+do_recursive(){
+  log_to_file "brew install [$1]"
+
+  folder_prep "$tmp_dir" 1
+  dep_list="$tmp_dir/$1.dep.txt"
+  log "dependencies in: $dep_list"
+  (
+  get_dependencies "$1" | tee "$dep_list"
+  log "1st level dependencies: $(< "$dep_list" wc -l)"
+    cat "$dep_list" \
+  | while read -r dep ; do
+      get_dependencies "$dep"
+    done
+  echo " "
+  ) \
+    | sort \
+    | uniq -c \
+    | sort -rn \
+    | awk '
+      length($2)>0 {print $2}
+      ' \
+    | while read -r line; do
+      if brew list "$line" > /dev/null 2>&1 ; then
+        # already installed
+        out "✔️ skip [$line] (already installed)"
+      else
+        announce "install [$line] ------------------------------------------------"
+        brew install --build-from-source "$line" 2> /dev/null
+      fi
+    done
+    announce "Dependencies have been installed - now main package"
+    brew install --build-from-source "$1"  2> /dev/null
+
+}
+
+get_dependencies(){
+  progress "get brew dependencies for [$1]"
+   brew info "$1" \
+  | awk '
+  /^Build:/ {$1=""; gsub(/,/,""); print}
+  /^Required:/ {$1 = ""; gsub(/,/,""); print}
+  ' \
+  | tr ' ' "\n"
+}
+
 
 #####################################################################
 ################### DO NOT MODIFY BELOW THIS LINE ###################
@@ -592,7 +671,6 @@ lookup_script_data(){
   readonly script_prefix=$(basename "${BASH_SOURCE[0]}" .sh)
   readonly script_basename=$(basename "${BASH_SOURCE[0]}")
   readonly execution_day=$(date "+%Y-%m-%d")
-  readonly execution_year=$(date "+%Y")
 
   # cf https://stackoverflow.com/questions/59895/how-to-get-the-source-directory-of-a-bash-script-from-within-the-script-itself
   # get installation folder of this script, resolving symlinks if necessary
@@ -624,13 +702,11 @@ lookup_script_data(){
 
   # if run inside a git repo, detect for which remote repo it is
   if git status >/dev/null 2>&1 ; then
-    readonly in_git_repo=1
     readonly git_repo_remote=$(git remote -v | awk '/(fetch)/ {print $2}')
     log "git remote: $git_repo_remote"
     readonly git_repo_root=$(git rev-parse --show-toplevel)
     log "git local : $git_repo_root"
   else
-    readonly in_git_repo=0
     readonly git_repo_root=""
     readonly git_repo_remote=""
   fi

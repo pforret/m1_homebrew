@@ -1,0 +1,25 @@
+total 0
+drwxrwxr-x    2 pforret  admin    64B Dec 21 23:21 Caskroom
+drwxrwxr-x   77 pforret  admin   2.4K Dec 21 23:36 Cellar
+drwxrwxr-x    4 pforret  admin   128B Dec 21 23:35 Frameworks
+drwxrwxr-x   20 pforret  admin   640B Dec 21 23:21 Homebrew
+drwxrwxr-x  270 pforret  admin   8.4K Dec 21 23:36 bin
+drwxrwxr-x    9 pforret  admin   288B Dec 21 23:34 etc
+drwxrwxr-x  138 pforret  admin   4.3K Dec 21 23:36 include
+drwxrwxr-x  364 pforret  admin    11K Dec 21 23:36 lib
+drwxrwxr-x   95 pforret  admin   3.0K Dec 21 23:36 opt
+drwxrwxr-x    9 pforret  admin   288B Dec 21 23:34 sbin
+drwxrwxr-x   27 pforret  admin   864B Dec 21 23:36 share
+drwxrwxr-x    4 pforret  admin   128B Dec 21 23:34 var
+  0B	/usr/local/Caskroom
+641M	/usr/local/Cellar
+  0B	/usr/local/Frameworks
+462M	/usr/local/Homebrew
+  0B	/usr/local/bin
+724K	/usr/local/etc
+  0B	/usr/local/include
+ 14M	/usr/local/lib
+  0B	/usr/local/opt
+  0B	/usr/local/sbin
+8.0K	/usr/local/share
+4.4M	/usr/local/var

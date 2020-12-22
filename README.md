@@ -3,31 +3,72 @@
 
 # Using Homebrew on Apple Silicon M1 (MacOS Big Sur)
 
-![](macos_m1_cli.jpg)
-## install_homebrew_native.sh
+![](doc/m1_homebrew.jpg)
 
-* install Homebrew in native mode (without Rosetta 2) on a fresh Apple M1 Arm computer (MacOS Big Sur)
-* run as: `curl -s https://raw.githubusercontent.com/pforret/macos_m1_cli/main/install_homebrew_native.sh | bash`
+## Usage
+
+    Program: m1_homebrew.sh 1.2.0 by peter@forret.com
+    Updated: Dec 22 21:41:12 2020
+    Usage: m1_homebrew.sh [-f] [-h] [-q] [-v] [-a <architecture>] [-l <log_dir>] [-t <tmp_dir>] <action> <package?>
+    Flags, options and parameters:
+    -f|--force       : [flag] do not ask for confirmation (always yes) [default: off]
+    -h|--help        : [flag] show usage [default: off]
+    -q|--quiet       : [flag] no output [default: off]
+    -v|--verbose     : [flag] output more [default: off]
+    -a|--architecture <?>: [option] install in arm64 or i386 mode  [default: auto]
+        -l|--log_dir <?> : [option] folder for log files   [default: /Users/pforret/log/m1_homebrew]
+    -t|--tmp_dir <?> : [option] folder for temp files  [default: /Users/pforret/.homebrew]
+    <action>         : [parameter] action to perform: check/install/uninstall/recursive
+    <package>        : [parameter] package to recursive install (optional)
+    
+    ### TIPS & EXAMPLES
+    * use `m1_homebrew check` to check if Homebrew is installed for Rosetta and/or native mode
+    * use `m1_homebrew install` to install Homebrew
+    * use `m1_homebrew uninstall` to uninstall Homebrew
+    * use `m1_homebrew recursive package` to install a package from source but first build its dependencies
+    * >>> bash script created with pforret/bashew
+    * >>> for developers, also check pforret/setver
+
+
+### m1_homebrew check
+
+Check what version of Homebrew are installed for i386 and arm64 mode.
+Output is like this:
+```
+Program: m1_homebrew.sh 1.2.0
+✔  MacOS version = 11.1
+✔  Script running in i386 mode
+…  Check Homebrew installation
+✔  Homebrew for arm64/M1 native is installed in /opt/homebrew (version 2.7.0-24-g53ef74f)
+✔  Homebrew for i386 /Rosetta2  is installed in /usr/local    (version 2.7.0)
+✔  Default brew = /usr/local/bin/brew
+Script finished after 5 seconds
+```
+
+
+### m1_homebrew install
+
+* install Homebrew in arm64 mode (without Rosetta 2) on a Apple M1 computer (MacOS Big Sur)
+* install Homebrew in i386 mode (with Rosetta 2) on a Apple M1 computer (MacOS Big Sur)
 
 Output is like this:
 ```
-### install_homebrew_native.sh from pforret/macos_m1_cli  Ⓜ️ 1️⃣
-🍺 Create a folder for Homebrew ...
-🍺 Download and install Homebrew from Github ...
-🍺 Adding [/opt/homebrew/bin] to your zsh startup config path
-🍺 Running brew a first time to trigger compilation
-Initialized empty Git repository in /opt/homebrew/.git/
-HEAD is now at 9db324ab7 Merge pull request #10045 from jonchang/remove-basic-autho
-==> make CC=clang CFLAGS= YACC=yacc -d
-🍺  /opt/homebrew/Cellar/awk/20180827: 7 files, 203.5KB, built in 3 seconds
-🍺 Homebrew was installed as native binary. Version will be > 2.6
-HOMEBREW_VERSION: 2.6.2-91-g9db324a
-#====================================
-🍺 Installation using 'brew install' will give a warning as long as Homebrew is not yet officially released for M1
-🍺 You can use 'brew install -s' to always build from source and skip that warning
-🍺 You might get build errors, but remember: you are an early adopter!
-#====================================
-🍺 Close this terminal and start a new one to make sure brew is in the path
+Program: m1_homebrew.sh 1.2.0
+✔  MacOS version = 11.1
+✔  Script running in arm64 mode
+Are you sure you want to install Homebrew for arm64 to /opt/homebrew? [y/N] Y 
+…  Create folder for [/opt/homebrew] Homebrew ...
+…  Download Homebrew into [/Users/pforret/.homebrew] ...
+✔  After download: Homebrew folder is 15 MB
+✔  After update  : Homebrew folder is 64 MB                                      
+✔  After install : Homebrew folder is 463 MB                                           
+…  Move Homebrew files to /opt/homebrew
+Create folder share/zshet/.homebrew/SECURITY.md ...                                                   
+Create folder share/zsh/site-functions
+Create folder Caskroom
+✔  All files moved to /opt/homebrew                           
+HOMEBREW_VERSION: 2.7.0-24-g53ef74f
+Script finished after 84 seconds
 ```  
 
 ### Using native Homebrew
@@ -58,56 +99,67 @@ brew install --build-from-source [some package]
   and run the main `brew install` again
 * you might have to do thius for every missing dependency, or use ...
 
-## `rebrew.sh`
+### m1_homebrew recursive package
 
 * **_recursive_ brew install -s** !!
-* `rebrew.sh install ffmpeg` will first look up all the dependencies of ffmpeg, 
+* `m1_homebrew recursive ffmpeg` will first look up all the dependencies of ffmpeg, 
   build those one after the other and then run the main `brew install`. 
   It will take some time, but it works!
 
-### install rebrew.sh
-* `git clone https://github.com/pforret/macos_m1_cli.git && cd macos_m1_cli`
-* or `basher install pforret/macos_m1_cli`
 
-## uninstall_homebrew_native.sh
+### m1_homebrew uninstall
 
 * if you prefer running in 'Rosetta 2' mode, you can uninstall the native mode Homebrew.
 * run as: `curl -s https://raw.githubusercontent.com/pforret/macos_m1_cli/main/uninstall_homebrew_native.sh | bash`
 
 Output is like this:
 ```  
-### uninstall_homebrew_native.sh from pforret/macos_m1_cli  Ⓜ️ 1️⃣
-🧽 Removing [/opt/homebrew/bin] from your zsh startup config path
-🧽 Deleting Homebrew from [/opt/homebrew]
+Program: m1_homebrew.sh 1.2.0
+✔  MacOS version = 11.1
+✔  Script running in arm64 mode
+Are you sure you want to uninstall Homebrew for arm64 from /opt/homebrew? [y/N] Y 
+…  Deleting Homebrew from [/opt/homebrew]
 Password:
-🧽 Homebrew was uninstalled!
+✔  All files have been deleted from /opt/homebrew
+Script finished after 8 seconds
 ```  
 
+## Installation
+
+    basher install pforret/macos_cli_m1
+
+or 
+
+  git clone https://github.com/pforret/m1_homebrew.git
+  cd m1_homebrew
+  ./m1_homebrew.sh
 ## My Homebrew configuration
 
 This is my current config (on Mac Mini M1, 18 Dec 2020):
 
-    $ brew config
-    HOMEBREW_VERSION: 2.6.2
-    ORIGIN: https://github.com/Homebrew/brew
-    HEAD: 1a52862e6d24cd3bf87bec557a8886a1a825ee3c
-    Last commit: 4 days ago
-    Core tap ORIGIN: https://github.com/Homebrew/homebrew-core
-    Core tap HEAD: c06f553c5f07a31e06ebebf806286141e0af7e0b
-    Core tap last commit: 40 minutes ago
-    Core tap branch: master
-    HOMEBREW_PREFIX: /opt/homebrew
-    HOMEBREW_CASK_OPTS: []
-    HOMEBREW_MAKE_JOBS: 8
-    Homebrew Ruby: 2.6.3 => /System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/bin/ruby
-    CPU: octa-core 64-bit arm_firestorm_icestorm
-    Clang: 12.0 build 1200
-    Git: 2.24.3 => /Library/Developer/CommandLineTools/usr/bin/git
-    Curl: 7.64.1 => /usr/bin/curl
-    macOS: 11.1-arm64
-    CLT: 12.3.0.0.1.1607026830
-    Xcode: N/A
-    Rosetta 2: false
+```  
+$ brew config
+HOMEBREW_VERSION: 2.7.0-24-g53ef74f
+ORIGIN: https://github.com/Homebrew/brew
+HEAD: 53ef74f67415949f0a9e6377af22b967336c1011
+Last commit: 4 hours ago
+Core tap ORIGIN: https://github.com/Homebrew/homebrew-core
+Core tap HEAD: 0533ab3b8cf3901d5dbb239155deda7c2424c659
+Core tap last commit: 9 minutes ago
+Core tap branch: master
+HOMEBREW_PREFIX: /opt/homebrew
+HOMEBREW_CASK_OPTS: []
+HOMEBREW_MAKE_JOBS: 8
+Homebrew Ruby: 2.6.3 => /System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/bin/ruby
+CPU: octa-core 64-bit arm_firestorm_icestorm
+Clang: 12.0 build 1200
+Git: 2.24.3 => /Library/Developer/CommandLineTools/usr/bin/git
+Curl: 7.64.1 => /usr/bin/curl
+macOS: 11.1-arm64
+CLT: 12.3.0.0.1.1607026830
+Xcode: N/A
+Rosetta 2: false
+```  
 
 
 ## More info
