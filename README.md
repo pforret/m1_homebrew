@@ -130,12 +130,13 @@ Script finished after 8 seconds
 
 or 
 
-  git clone https://github.com/pforret/m1_homebrew.git
-  cd m1_homebrew
-  ./m1_homebrew.sh
+    git clone ://github.com/pforret/m1_homebrew.git
+    cd m1_homebrew
+    ./m1_homebrew.sh
+
 ## My Homebrew configuration
 
-This is my current config (on Mac Mini M1, 18 Dec 2020):
+This is my current config (on Mac Mini M1, 22 Dec 2020):
 
 ```  
 $ brew config
