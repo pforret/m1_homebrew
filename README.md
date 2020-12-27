@@ -130,7 +130,7 @@ Script finished after 8 seconds
 
 or 
 
-    git clone ://github.com/pforret/m1_homebrew.git
+    git clone https://github.com/pforret/m1_homebrew.git
     cd m1_homebrew
     ./m1_homebrew.sh
 
