@@ -185,8 +185,8 @@ do_install(){
     [[ -x "$HOMEBREW_PREFIX/bin/brew" ]] || die "Executable [$HOMEBREW_PREFIX/bin/brew] not found"
 
     case $(basename "$SHELL") in
-    zsh)    startup_config "$architecture" "$HOMEBREW_PREFIX" "$script_prefix-$architecture" >> ~/.zshrc  ;;
-    bash)   startup_config "$architecture" "$HOMEBREW_PREFIX" "$script_prefix-$architecture" >> ~/.bashrc  ;;
+    zsh)    startup_config "$architecture" "$HOMEBREW_PREFIX" "$script_prefix-$architecture" >> "$HOME/.zshrc"  ; source "$HOME/.zshrc" ;;
+    bash)   startup_config "$architecture" "$HOMEBREW_PREFIX" "$script_prefix-$architecture" >> "$HOME/.bashrc" ; source "$HOME/.bashrc" ;;
     *)      announce "Add the following to your shell startup script, could not be done automatically"
             echo "#####"
             startup_config "$ARCH" "$HOMEBREW_PREFIX"
@@ -202,7 +202,6 @@ do_install(){
     arch -"$architecture" "$HOMEBREW_PREFIX/bin/brew" config | grep VERSION
   fi
   log_to_file "Finish $architecture install of Homebrew"
-
 }
 
 do_uninstall(){
@@ -272,15 +271,15 @@ do_recursive(){
 
   folder_prep "$tmp_dir" 1
   dep_list="$tmp_dir/$1.dep.txt"
+  dep_list1="$tmp_dir/$1.dep1.txt"
   log "dependencies in: $dep_list"
   (
-  get_dependencies "$1" | tee "$dep_list"
-  log "1st level dependencies: $(< "$dep_list" wc -l)"
-    cat "$dep_list" \
-  | while read -r dep ; do
+  get_dependencies "$1" | tee "$dep_list1"
+  log "1st level dependencies: $(< "$dep_list1" wc -l)"
+   while read -r dep ; do
       get_dependencies "$dep"
-    done
-  echo " "
+    done < "$dep_list1"
+    echo " "
   ) \
     | sort \
     | uniq -c \
@@ -289,6 +288,8 @@ do_recursive(){
       length($2)>0 {print $2}
       ' \
     | while read -r line; do
+      log ">>> $line"
+      [[ -z "$line" ]] && continue
       if brew list "$line" > /dev/null 2>&1 ; then
         # already installed
         out "✔️ skip [$line] (already installed)"
@@ -309,7 +310,8 @@ get_dependencies(){
   /^Build:/ {$1=""; gsub(/,/,""); print}
   /^Required:/ {$1 = ""; gsub(/,/,""); print}
   ' \
-  | tr ' ' "\n"
+  | tr ' ' "\n" \
+  | grep -v '^\s*$'
 }
 
 
