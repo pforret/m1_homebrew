@@ -189,7 +189,7 @@ do_install(){
     bash)   startup_config "$architecture" "$HOMEBREW_PREFIX" "$script_prefix-$architecture" >> "$HOME/.bashrc" ; source "$HOME/.bashrc" ;;
     *)      announce "Add the following to your shell startup script, could not be done automatically"
             echo "#####"
-            startup_config "$ARCH" "$HOMEBREW_PREFIX"
+            startup_config "$architecture" "$HOMEBREW_PREFIX"
             echo "#####"
     esac
 
