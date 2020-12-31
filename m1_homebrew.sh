@@ -242,7 +242,7 @@ do_uninstall(){
 
   [[ -f "$HOMEBREW_PREFIX/bin/brew" ]] && die "Could not remove Homebrew"
 }
-ll
+
 startup_config(){
   # $1 = architecture
   # $2 = homebrew folder
