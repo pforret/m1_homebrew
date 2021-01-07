@@ -184,9 +184,10 @@ do_install(){
 
     [[ -x "$HOMEBREW_PREFIX/bin/brew" ]] || die "Executable [$HOMEBREW_PREFIX/bin/brew] not found"
 
+    startup_config_text="$(startup_config "$architecture" "$HOMEBREW_PREFIX")"
     case $(basename "$SHELL") in
-    zsh)    startup_config "$architecture" "$HOMEBREW_PREFIX" "$script_prefix-$architecture" >> "$HOME/.zshrc"  ; source "$HOME/.zshrc" ;;
-    bash)   startup_config "$architecture" "$HOMEBREW_PREFIX" "$script_prefix-$architecture" >> "$HOME/.bashrc" ; source "$HOME/.bashrc" ;;
+    zsh)    startup_config "$architecture" "$HOMEBREW_PREFIX" "$script_prefix-$architecture" >> "$HOME/.zshrc"  ; $startup_config_text ;;
+    bash)   startup_config "$architecture" "$HOMEBREW_PREFIX" "$script_prefix-$architecture" >> "$HOME/.bashrc" ; $startup_config_text ;;
     *)      announce "Add the following to your shell startup script, could not be done automatically"
             echo "#####"
             startup_config "$architecture" "$HOMEBREW_PREFIX"
@@ -213,8 +214,9 @@ do_uninstall(){
   esac
 
   [[ -x "$HOMEBREW_PREFIX/bin/brew" ]] || die "Homebrew for $architecture is not installed in $HOMEBREW_PREFIX!"
-  confirm "Are you sure you want to uninstall Homebrew for $architecture from $HOMEBREW_PREFIX?" || die "Install interrupted"
+  nb_installed="$("$HOMEBREW_PREFIX/bin/brew" list | awk 'END{print NR}')"
 
+  confirm "Are you sure you want to uninstall Homebrew (with $nb_installed packages) from $HOMEBREW_PREFIX ($architecture)?" || die "Install interrupted"
   case $(basename "$SHELL") in
   zsh)  remove_from_config ~/.zshrc "#$script_prefix-$architecture" ;;
   bash) remove_from_config ~/.bashrc "#$script_prefix-$architecture" ;;
