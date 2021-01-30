@@ -1,7 +1,7 @@
 [![basher install](https://img.shields.io/badge/basher-install-white?logo=gnu-bash&style=flat)](https://basher.gitparade.com/package/)
 ![version](https://img.shields.io/github/v/release/pforret/macos_m1_cli)
 
-# Using Homebrew on Apple Silicon M1 (MacOS Big Sur)
+# Using Homebrew on Apple Silicon M1 (MacOS Big Sur) 
 
 ![](doc/m1_homebrew.jpg)
 
@@ -16,7 +16,7 @@
     -q|--quiet       : [flag] no output [default: off]
     -v|--verbose     : [flag] output more [default: off]
     -a|--architecture <?>: [option] install in arm64 or i386 mode  [default: auto]
-        -l|--log_dir <?> : [option] folder for log files   [default: /Users/pforret/log/m1_homebrew]
+    -l|--log_dir <?> : [option] folder for log files   [default: /Users/pforret/log/m1_homebrew]
     -t|--tmp_dir <?> : [option] folder for temp files  [default: /Users/pforret/.homebrew]
     <action>         : [parameter] action to perform: check/install/uninstall/recursive
     <package>        : [parameter] package to recursive install (optional)
@@ -29,7 +29,13 @@
     * >>> bash script created with pforret/bashew
     * >>> for developers, also check pforret/setver
 
+Running `m1_homebreew check` on Intel/Rosetta2:
+![m1_homebrew check for i386](doc/check_i386.png)
 
+Running `m1_homebreew check` on M1/ARM64:
+![m1_homebrew check for arm64](doc/check_arm64.png)
+
+![]()
 ### m1_homebrew check
 
 Check what version of Homebrew are installed for i386 and arm64 mode.
