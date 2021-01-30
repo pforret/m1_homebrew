@@ -29,27 +29,15 @@
     * >>> bash script created with pforret/bashew
     * >>> for developers, also check pforret/setver
 
-Running `m1_homebreew check` on Intel/Rosetta2:
-![m1_homebrew check for i386](doc/check_i386.png)
-
-Running `m1_homebreew check` on M1/ARM64:
-![m1_homebrew check for arm64](doc/check_arm64.png)
-
-![]()
 ### m1_homebrew check
 
 Check what version of Homebrew are installed for i386 and arm64 mode.
-Output is like this:
-```
-Program: m1_homebrew.sh 1.2.0
-✔  MacOS version = 11.1
-✔  Script running in i386 mode
-…  Check Homebrew installation
-✔  Homebrew for arm64/M1 native is installed in /opt/homebrew (version 2.7.0-24-g53ef74f)
-✔  Homebrew for i386 /Rosetta2  is installed in /usr/local    (version 2.7.0)
-✔  Default brew = /usr/local/bin/brew
-Script finished after 5 seconds
-```
+
+Running `m1_homebrew check` on Intel/Rosetta2:
+![m1_homebrew check for i386](doc/check_i386.png)
+
+Running `m1_homebrew check` on M1/ARM64:
+![m1_homebrew check for arm64](doc/check_arm64.png)
 
 
 ### m1_homebrew install
