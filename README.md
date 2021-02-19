@@ -3,7 +3,7 @@
 
 # Using Homebrew on Apple Silicon M1 (MacOS Big Sur) 
 
-![](doc/m1_homebrew.jpg)
+![](doc/homebrew.jpg)
 
 ## Usage
 
